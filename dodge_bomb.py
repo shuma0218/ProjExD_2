@@ -3,6 +3,7 @@ import sys
 import pygame as pg
 import random
 import time
+import math
 
 
 WIDTH, HEIGHT = 1100, 650
@@ -87,6 +88,41 @@ def get_kk_img(sum_mv: tuple[int, int]) -> pg.Surface:
     # 合計移動量が辞書にない場合は静止画像を返す
     return kk_imgs.get(sum_mv, kk_imgs[(0, 0)])
 
+def calc_orientation(org: pg.Rect, dst: pg.Rect, current_xy: tuple[float, float]) -> tuple[float, float]:
+    """
+    爆弾から見てこうかとんの位置を計算し、方向ベクトルを正規化して返す。
+
+    Args:
+        org (pg.Rect): 爆弾のRectオブジェクト（起点）
+        dst (pg.Rect): こうかとんのRectオブジェクト（目標）
+        current_xy (tuple[float, float]): 現在の爆弾の速度ベクトル (vx, vy)
+
+    Returns:
+        tuple[float, float]: 次の移動速度ベクトル (vx, vy)
+    """
+    # 爆弾（org）からこうかとん（dst）への差ベクトルを計算
+    dx = dst.centerx - org.centerx
+    dy = dst.centery - org.centery
+
+    # ノルム（ベクトルの長さ）を計算
+    norm = math.sqrt(dx**2 + dy**2)
+
+    # こうかとんとの距離が300以上の場合のみ方向を更新
+    if norm >= 300:
+        # ノルムが0ではない場合、方向を正規化して速度を計算
+        if norm != 0:
+            dx /= norm
+            dy /= norm
+
+        # ベクトルの長さを√50に調整
+        dx *= math.sqrt(50)
+        dy *= math.sqrt(50)
+
+        return dx, dy
+    else:
+        # 距離が300未満の場合は慣性を保持
+        return current_xy
+
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
@@ -140,6 +176,7 @@ def main():
         # 爆弾の画像と速度の更新
         current_stage = min(tmr // 500, 9)  # tmr に応じて段階を0~9
         bb_img = bb_imgs[current_stage]
+        vx, vy = calc_orientation(bb_rct, kk_rct, (vx, vy))
         avx = vx * bb_accs[current_stage]
         avy = vy * bb_accs[current_stage]
 
