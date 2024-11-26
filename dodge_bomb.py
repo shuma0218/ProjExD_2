@@ -60,7 +60,7 @@ def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
         pg.draw.circle(bb_img, (255, 0, 0), (10 * r, 10 * r), 10 * r)  # 爆弾を描画
         bb_imgs.append(bb_img)  # リストに追加
 
-    return bb_imgs, bb_accs
+    return [bb_imgs, bb_accs]
 
 def get_kk_img(sum_mv: tuple[int, int]) -> pg.Surface:
     """
@@ -79,7 +79,7 @@ def get_kk_img(sum_mv: tuple[int, int]) -> pg.Surface:
         (-5, 0): pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 1.0),  # 左向き
         (0, 5): pg.transform.rotozoom(pg.image.load("fig/3.png"), 90, 1.0),  # 下向き
         (0, -5): pg.transform.rotozoom(pg.image.load("fig/3.png"), -90, 1.0),  # 上向き
-        (5, 5): pg.transform.rotozoom(pg.image.load("fig/3.png"), -135, 1.0),  # 右下
+        (5, 5): pg.transform.flip(pg.transform.rotozoom(pg.image.load("fig/3.png"), -135, 1.0),False,True), # 右下
         (5, -5): pg.transform.rotozoom(pg.image.load("fig/3.png"), -45, 1.0),  # 右上
         (-5, 5): pg.transform.rotozoom(pg.image.load("fig/3.png"), 135, 1.0),  # 左下
         (-5, -5): pg.transform.rotozoom(pg.image.load("fig/3.png"), 45, 1.0),  # 左上
@@ -90,26 +90,26 @@ def get_kk_img(sum_mv: tuple[int, int]) -> pg.Surface:
 
 def calc_orientation(org: pg.Rect, dst: pg.Rect, current_xy: tuple[float, float]) -> tuple[float, float]:
     """
-    爆弾から見てこうかとんの位置を計算し、方向ベクトルを正規化して返す。
+    爆弾から見てこうかとんの位置を計算し、方向ベクトルを返す。
 
     Args:
-        org (pg.Rect): 爆弾のRectオブジェクト（起点）
-        dst (pg.Rect): こうかとんのRectオブジェクト（目標）
+        org (pg.Rect): 爆弾のRectオブジェクト
+        dst (pg.Rect): こうかとんのRectオブジェクト
         current_xy (tuple[float, float]): 現在の爆弾の速度ベクトル (vx, vy)
 
     Returns:
         tuple[float, float]: 次の移動速度ベクトル (vx, vy)
     """
-    # 爆弾（org）からこうかとん（dst）への差ベクトルを計算
+    # 爆弾からこうかとんへの差ベクトルを計算
     dx = dst.centerx - org.centerx
     dy = dst.centery - org.centery
 
-    # ノルム（ベクトルの長さ）を計算
+    # ベクトルの長さを計算
     norm = math.sqrt(dx**2 + dy**2)
 
     # こうかとんとの距離が300以上の場合のみ方向を更新
     if norm >= 300:
-        # ノルムが0ではない場合、方向を正規化して速度を計算
+        # ノルムが0ではない場合、方向と速度計算
         if norm != 0:
             dx /= norm
             dy /= norm
@@ -118,9 +118,9 @@ def calc_orientation(org: pg.Rect, dst: pg.Rect, current_xy: tuple[float, float]
         dx *= math.sqrt(50)
         dy *= math.sqrt(50)
 
-        return dx, dy
+        return [dx, dy]
     else:
-        # 距離が300未満の場合は慣性を保持
+        # 距離が300未満の場合は慣性維持
         return current_xy
 
 def main():
@@ -131,6 +131,8 @@ def main():
     kk_img = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)
     kk_rct = kk_img.get_rect()
     kk_rct.center = 300, 200
+    
+    #移動キー辞書
     DELTA = {
     pg.K_UP: (0, -5),
     pg.K_DOWN: (0, 5),
