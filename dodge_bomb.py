@@ -2,6 +2,7 @@ import os
 import sys
 import pygame as pg
 import random
+import time
 
 
 WIDTH, HEIGHT = 1100, 650
@@ -17,6 +18,33 @@ def check_bound(rect):
     x_bound = 0 <= rect.left and rect.right <= WIDTH
     y_bound = 0 <= rect.top and rect.bottom <= HEIGHT
     return x_bound, y_bound
+
+def game_over(screen: pg.Surface) -> None:
+    """ゲームオーバー時の画面を表示する関数
+    Args:
+        screen (pg.Surface): ゲーム画面のSurfaceオブジェクト
+    """
+    # 画面をブラックアウト
+    overlay = pg.Surface((WIDTH, HEIGHT))  # 全画面サイズのSurface
+    overlay.fill((0, 0, 0))  # 黒色で塗りつぶし
+    overlay.set_alpha(128)  # 半透明設定
+    screen.blit(overlay, (0, 0))  # 画面に適用
+
+    # 泣いているこうかとん画像
+    crying_img = pg.transform.rotozoom(pg.image.load("fig/8.png"), 0, 0.9)  # 画像を0.9倍に拡大
+    crying_rect_r = crying_img.get_rect(center=(WIDTH // 2 + 200, HEIGHT // 2))
+    crying_rect_l = crying_img.get_rect(center=(WIDTH // 2 - 200, HEIGHT // 2))  # 画面中央付近に配置
+    screen.blit(crying_img, crying_rect_r)
+    screen.blit(crying_img, crying_rect_l)  # 画面に貼り付け
+
+    # 「Game Over」の文字
+    font = pg.font.Font(None, 80)  # フォントサイズを80に設定
+    text = font.render("Game Over", True, (255, 255, 255))  # 白色で文字作成
+    text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))  # 中央より少し上に配置
+    screen.blit(text, text_rect)  # 画面に貼り付け
+    
+    pg.display.update()  # 画面更新
+    time.sleep(5)  # 5秒間表示
 
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
@@ -73,6 +101,11 @@ def main():
         screen.blit(bb_img, bb_rct)
         kk_rct.move_ip(sum_mv)
         screen.blit(kk_img, kk_rct)
+
+        # 衝突判定
+        if kk_rct.colliderect(bb_rct):
+            game_over(screen)
+            return    # 衝突した場合、main関数を終了
         pg.display.update()
         tmr += 1
         clock.tick(50)
