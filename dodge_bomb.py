@@ -196,6 +196,7 @@ def main():
         # 衝突判定
         if kk_rct.colliderect(bb_rct):
             game_over(screen)
+
             return    # 衝突した場合、main関数を終了
         pg.display.update()
         tmr += 1
