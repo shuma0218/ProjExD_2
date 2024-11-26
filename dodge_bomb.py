@@ -118,7 +118,7 @@ def calc_orientation(org: pg.Rect, dst: pg.Rect, current_xy: tuple[float, float]
         dx *= math.sqrt(50)
         dy *= math.sqrt(50)
 
-        return [dx, dy]
+        return (dx, dy)
     else:
         # 距離が300未満の場合は慣性維持
         return current_xy
