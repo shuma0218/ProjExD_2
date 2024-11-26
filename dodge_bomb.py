@@ -61,6 +61,32 @@ def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
 
     return bb_imgs, bb_accs
 
+def get_kk_img(sum_mv: tuple[int, int]) -> pg.Surface:
+    """
+    移動量の合計値タプルに対応する向きのこうかとん画像Surfaceを返す関数。
+
+    Args:
+        sum_mv (tuple[int, int]): 移動量の合計値タプル (dx, dy)
+
+    Returns:
+        pg.Surface: 移動量に対応する向きの画像Surface
+    """
+    # こうかとん画像の辞書を準備
+    kk_imgs = {
+        (0, 0): pg.image.load("fig/3.png"),  # 静止画像
+        (5, 0): pg.transform.flip(pg.image.load("fig/3.png"), True, False),  # 右向き
+        (-5, 0): pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 1.0),  # 左向き
+        (0, 5): pg.transform.rotozoom(pg.image.load("fig/3.png"), 90, 1.0),  # 下向き
+        (0, -5): pg.transform.rotozoom(pg.image.load("fig/3.png"), -90, 1.0),  # 上向き
+        (5, 5): pg.transform.rotozoom(pg.image.load("fig/3.png"), -135, 1.0),  # 右下
+        (5, -5): pg.transform.rotozoom(pg.image.load("fig/3.png"), -45, 1.0),  # 右上
+        (-5, 5): pg.transform.rotozoom(pg.image.load("fig/3.png"), 135, 1.0),  # 左下
+        (-5, -5): pg.transform.rotozoom(pg.image.load("fig/3.png"), 45, 1.0),  # 左上
+    }
+
+    # 合計移動量が辞書にない場合は静止画像を返す
+    return kk_imgs.get(sum_mv, kk_imgs[(0, 0)])
+
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
@@ -96,12 +122,16 @@ def main():
                 return
         screen.blit(bg_img, [0, 0]) 
 
+        #こうかとん移動
         key_lst = pg.key.get_pressed()
         sum_mv = [0, 0]
         for key, delta in DELTA.items():
             if key_lst[key]:
                 sum_mv[0] += delta[0]
                 sum_mv[1] += delta[1]
+        
+        kk_img = get_kk_img(tuple(sum_mv))
+        kk_rct.move_ip(sum_mv)
 
         # こうかとんが画面外に出ていないか判定
         if not all(check_bound(kk_rct)):
@@ -122,7 +152,6 @@ def main():
 
         # 爆弾とこうかとんを描画
         screen.blit(bb_img, bb_rct)
-        kk_rct.move_ip(sum_mv)
         screen.blit(kk_img, kk_rct)
 
         # 衝突判定
