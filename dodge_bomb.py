@@ -80,9 +80,9 @@ def get_kk_img(sum_mv: tuple[int, int]) -> pg.Surface:
         (0, 5): pg.transform.rotozoom(pg.image.load("fig/3.png"), 90, 1.0),  # 下向き
         (0, -5): pg.transform.rotozoom(pg.image.load("fig/3.png"), -90, 1.0),  # 上向き
         (5, 5): pg.transform.flip(pg.transform.rotozoom(pg.image.load("fig/3.png"), -135, 1.0),False,True), # 右下
-        (5, -5): pg.transform.rotozoom(pg.image.load("fig/3.png"), -45, 1.0),  # 右上
-        (-5, 5): pg.transform.rotozoom(pg.image.load("fig/3.png"), 135, 1.0),  # 左下
-        (-5, -5): pg.transform.rotozoom(pg.image.load("fig/3.png"), 45, 1.0),  # 左上
+        (5, -5): pg.transform.flip(pg.transform.rotozoom(pg.image.load("fig/3.png"), -45, 1.0),True,False),  # 右上
+        (-5, 5): pg.transform.rotozoom(pg.image.load("fig/3.png"), 45, 1.0),  # 左下
+        (-5, -5): pg.transform.rotozoom(pg.image.load("fig/3.png"), -45, 1.0),  # 左上
     }
 
     # 合計移動量が辞書にない場合は静止画像を返す
