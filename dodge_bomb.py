@@ -74,7 +74,7 @@ def get_kk_img(sum_mv: tuple[int, int]) -> pg.Surface:
     """
     # こうかとん画像の辞書を準備
     kk_imgs = {
-        (0, 0): pg.image.load("fig/3.png"),  # 静止画像
+        (0, 0): pg.image.load("fig/3.png"),
         (5, 0): pg.transform.flip(pg.image.load("fig/3.png"), True, False),  # 右向き
         (-5, 0): pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 1.0),  # 左向き
         (0, 5): pg.transform.rotozoom(pg.image.load("fig/3.png"), 90, 1.0),  # 下向き
