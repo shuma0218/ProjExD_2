@@ -1,6 +1,7 @@
 import os
 import sys
 import pygame as pg
+import random
 
 
 WIDTH, HEIGHT = 1100, 650
@@ -22,6 +23,14 @@ def main():
     pg.K_RIGHT: (5, 0),
     }
 
+    bb_img = pg.Surface((20, 20))  # 爆弾のサイズ (20x20)
+    bb_img.set_colorkey((0, 0, 0))  # 黒い部分を透明に
+    pg.draw.circle(bb_img, (255, 0, 0), (10, 10), 10)  # 赤い円を描画
+    bb_rct = bb_img.get_rect()
+    bb_rct.topleft = (random.randint(0, WIDTH-20), random.randint(0, HEIGHT-20))
+
+    vx, vy = 5, 5
+    
     clock = pg.time.Clock()
     tmr = 0
     while True:
@@ -37,6 +46,17 @@ def main():
                 sum_mv[0] += delta[0]
                 sum_mv[1] += delta[1]
 
+         # 爆弾の移動
+        bb_rct.move_ip(vx, vy)
+
+        # 爆弾が画面端に当たったら反転
+        if bb_rct.left < 0 or bb_rct.right > WIDTH:
+            vx *= -1
+        if bb_rct.top < 0 or bb_rct.bottom > HEIGHT:
+            vy *= -1
+
+        # 爆弾とこうかとんを描画
+        screen.blit(bb_img, bb_rct)
         kk_rct.move_ip(sum_mv)
         screen.blit(kk_img, kk_rct)
         pg.display.update()
