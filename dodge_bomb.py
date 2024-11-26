@@ -17,7 +17,7 @@ def check_bound(rect):
     """
     x_bound = 0 <= rect.left and rect.right <= WIDTH
     y_bound = 0 <= rect.top and rect.bottom <= HEIGHT
-    return x_bound, y_bound
+    return [x_bound, y_bound]
 
 def game_over(screen: pg.Surface) -> None:
     """ゲームオーバー時の画面を表示する関数
