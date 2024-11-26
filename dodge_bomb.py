@@ -7,6 +7,16 @@ import random
 WIDTH, HEIGHT = 1100, 650
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
+def check_bound(rect):
+    """オブジェクトが画面内か画面外かを判定する関数
+    Args:
+        rect (pg.Rect): 判定するRectオブジェクト
+    Returns:
+        tuple[bool, bool]: 横方向, 縦方向の真理値タプル (True: 画面内, False: 画面外)
+    """
+    x_bound = 0 <= rect.left and rect.right <= WIDTH
+    y_bound = 0 <= rect.top and rect.bottom <= HEIGHT
+    return x_bound, y_bound
 
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
@@ -46,14 +56,18 @@ def main():
                 sum_mv[0] += delta[0]
                 sum_mv[1] += delta[1]
 
+        # こうかとんが画面外に出ていないか判定
+        if not all(check_bound(kk_rct)):
+            kk_rct.move_ip(-sum_mv[0], -sum_mv[1])  # 移動をキャンセル
+
          # 爆弾の移動
         bb_rct.move_ip(vx, vy)
 
-        # 爆弾が画面端に当たったら反転
+        # 爆弾が画面外に出たら速度を反転
         if bb_rct.left < 0 or bb_rct.right > WIDTH:
-            vx *= -1
+            vx = -vx
         if bb_rct.top < 0 or bb_rct.bottom > HEIGHT:
-            vy *= -1
+            vy = -vy
 
         # 爆弾とこうかとんを描画
         screen.blit(bb_img, bb_rct)
