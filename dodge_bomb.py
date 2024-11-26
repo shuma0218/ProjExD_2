@@ -18,7 +18,7 @@ def check_bound(rect):
     """
     x_bound = 0 <= rect.left and rect.right <= WIDTH
     y_bound = 0 <= rect.top and rect.bottom <= HEIGHT
-    return [x_bound, y_bound]
+    return (x_bound, y_bound)
 
 def game_over(screen: pg.Surface) -> None:
     """ゲームオーバー時の画面を表示する関数
@@ -60,7 +60,7 @@ def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
         pg.draw.circle(bb_img, (255, 0, 0), (10 * r, 10 * r), 10 * r)  # 爆弾を描画
         bb_imgs.append(bb_img)  # リストに追加
 
-    return [bb_imgs, bb_accs]
+    return (bb_imgs, bb_accs)
 
 def get_kk_img(sum_mv: tuple[int, int]) -> pg.Surface:
     """
