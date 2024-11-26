@@ -55,7 +55,7 @@ def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
     bb_accs = [a for a in range(1, 11)]  # 加速度リスト（1～10）
 
     for r in range(1, 11):  # 半径を1倍～10倍に拡大
-        bb_img = pg.Surface((20 * r, 20 * r), pg.SRCALPHA)  # 半透明サーフェス
+        bb_img = pg.Surface((20 * r, 20 * r), pg.SRCALPHA)
         pg.draw.circle(bb_img, (255, 0, 0), (10 * r, 10 * r), 10 * r)  # 爆弾を描画
         bb_imgs.append(bb_img)  # リストに追加
 
@@ -108,7 +108,7 @@ def main():
             kk_rct.move_ip(-sum_mv[0], -sum_mv[1])  # 移動をキャンセル
 
         # 爆弾の画像と速度の更新
-        current_stage = min(tmr // 500, 9)  # tmr に応じて段階を決定（最大9）
+        current_stage = min(tmr // 500, 9)  # tmr に応じて段階を0~9
         bb_img = bb_imgs[current_stage]
         avx = vx * bb_accs[current_stage]
         avy = vy * bb_accs[current_stage]
