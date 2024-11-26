@@ -46,6 +46,21 @@ def game_over(screen: pg.Surface) -> None:
     pg.display.update()  # 画面更新
     time.sleep(5)  # 5秒間表示
 
+def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
+    """サイズの異なる爆弾Surfaceのリストと加速度リストを生成する関数
+    Returns:
+        tuple[list[pg.Surface], list[int]]: 爆弾Surfaceリストと加速度リスト
+    """
+    bb_imgs = []  # 爆弾Surfaceのリスト
+    bb_accs = [a for a in range(1, 11)]  # 加速度リスト（1～10）
+
+    for r in range(1, 11):  # 半径を1倍～10倍に拡大
+        bb_img = pg.Surface((20 * r, 20 * r), pg.SRCALPHA)  # 半透明サーフェス
+        pg.draw.circle(bb_img, (255, 0, 0), (10 * r, 10 * r), 10 * r)  # 爆弾を描画
+        bb_imgs.append(bb_img)  # リストに追加
+
+    return bb_imgs, bb_accs
+
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
@@ -67,7 +82,11 @@ def main():
     bb_rct = bb_img.get_rect()
     bb_rct.topleft = (random.randint(0, WIDTH-20), random.randint(0, HEIGHT-20))
 
-    vx, vy = 5, 5
+    # 爆弾画像と加速度リストの初期化
+    bb_imgs, bb_accs = init_bb_imgs()
+    bb_rct = bb_imgs[0].get_rect(center=(WIDTH // 2, HEIGHT // 2))
+    vx, vy = 5, 5  # 初期速度
+
     
     clock = pg.time.Clock()
     tmr = 0
@@ -88,9 +107,13 @@ def main():
         if not all(check_bound(kk_rct)):
             kk_rct.move_ip(-sum_mv[0], -sum_mv[1])  # 移動をキャンセル
 
-         # 爆弾の移動
-        bb_rct.move_ip(vx, vy)
+        # 爆弾の画像と速度の更新
+        current_stage = min(tmr // 500, 9)  # tmr に応じて段階を決定（最大9）
+        bb_img = bb_imgs[current_stage]
+        avx = vx * bb_accs[current_stage]
+        avy = vy * bb_accs[current_stage]
 
+        bb_rct.move_ip(avx, avy)  # 爆弾の移動
         # 爆弾が画面外に出たら速度を反転
         if bb_rct.left < 0 or bb_rct.right > WIDTH:
             vx = -vx
